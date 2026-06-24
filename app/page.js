@@ -3,9 +3,9 @@ import Form from '../components/Form';
 
 export default function Home() {
   return (
-    <main style={{ position: 'relative', width: '100%', height: '600px' }}>
-      {/* Фон с анимированными линиями */}
-      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100vh' }}>
+      {/* Фон с анимированными линиями – растягивается на всю высоту */}
+      <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0 }}>
         <FloatingLines 
           enabledWaves={["top","middle","bottom"]}
           lineCount={8}
@@ -21,26 +21,35 @@ export default function Home() {
         />
       </div>
 
-      {/* Текст по центру */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          color: 'white',
-          fontSize: '3rem',
+      {/* Контент поверх фона – flex-контейнер с вертикальным центрированием */}
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        padding: '2rem 1rem', // отступы для мобильных
+        boxSizing: 'border-box',
+        textAlign: 'center',
+        color: 'white',
+        gap: '2rem', // расстояние между текстом и формой
+      }}>
+        {/* Заголовок с адаптивным размером */}
+        <h1 style={{
+          fontSize: 'clamp(2.5rem, 10vw, 4rem)',
           fontWeight: 'bold',
           textShadow: '0 0 10px rgba(0,0,0,0.5)',
-          zIndex: 10,
-          textAlign: 'center',
-          pointerEvents: 'none', // чтобы текст не мешал взаимодействию с линиями
-        }}
-      >
-        Меллстрой
-      </div>
-        <Form></Form>
+          margin: 0,
+          pointerEvents: 'none', // чтобы не мешать взаимодействию с линиями
+        }}>
+          Меллстрой
+        </h1>
 
+        {/* Форма */}
+        <Form />
+      </div>
     </main>
   );
 }
