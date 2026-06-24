@@ -3,8 +3,137 @@
 import { useState } from 'react';
 
 export default function Form() {
-  // ... (весь код состояния, валидации и обработчиков остаётся без изменений)
-  // Оставляем ту же логику, меняем только вёрстку
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    patronymic: '',
+    height: '',
+    birthDate: '',
+    favoriteColor: '',
+    favoriteGame: '',
+    favoriteFruit: '',
+  });
+
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Если поле было с ошибкой, убираем её при вводе
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: false }));
+    }
+  };
+
+  // Улучшенная валидация
+  const validateForm = () => {
+    const requiredFields = [
+      'firstName',
+      'lastName',
+      'height',
+      'birthDate',
+      'favoriteColor',
+      'favoriteGame',
+      'favoriteFruit',
+    ];
+    const newErrors = {};
+    let isValid = true;
+
+    requiredFields.forEach((field) => {
+      const value = formData[field];
+      let isEmpty = false;
+
+      // Проверка на пустоту в зависимости от типа
+      if (value === undefined || value === null) {
+        isEmpty = true;
+      } else if (typeof value === 'string' && value.trim() === '') {
+        isEmpty = true;
+      } else if (typeof value === 'number' && isNaN(value)) {
+        isEmpty = true;
+      } else if (field === 'height' && (value === '' || value === undefined || value === null)) {
+        isEmpty = true;
+      } else if (field === 'birthDate' && !value) {
+        isEmpty = true;
+      }
+
+      if (isEmpty) {
+        newErrors[field] = true;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+
+    // Логируем данные формы и ошибки для отладки
+    console.log('📋 Данные формы:', formData);
+    console.log('❌ Ошибки валидации:', newErrors);
+
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      // Формируем список полей с ошибками
+      const fieldNames = {
+        firstName: 'Имя',
+        lastName: 'Фамилия',
+        height: 'Рост',
+        birthDate: 'Дата рождения',
+        favoriteColor: 'Любимый цвет',
+        favoriteGame: 'Любимая игра',
+        favoriteFruit: 'Любимый фрукт',
+      };
+      const errorFields = Object.keys(errors)
+        .filter((key) => errors[key])
+        .map((key) => fieldNames[key] || key)
+        .join(', ');
+      setStatus({
+        type: 'error',
+        message: `Пожалуйста, заполните: ${errorFields}`,
+      });
+      return;
+    }
+
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      const res = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatus({ type: 'success', message: 'Форма успешно отправлена!' });
+        setFormData({
+          firstName: '',
+          lastName: '',
+          patronymic: '',
+          height: '',
+          birthDate: '',
+          favoriteColor: '',
+          favoriteGame: '',
+          favoriteFruit: '',
+        });
+        setErrors({});
+      } else {
+        setStatus({ type: 'error', message: data.error || 'Ошибка отправки' });
+      }
+    } catch (error) {
+      setStatus({ type: 'error', message: 'Ошибка соединения с сервером' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   const getInputClassName = (fieldName) => {
     const base =
