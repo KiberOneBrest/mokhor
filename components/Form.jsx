@@ -21,13 +21,11 @@ export default function Form() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Если поле было с ошибкой, убираем её при вводе
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: false }));
     }
   };
 
-  // Улучшенная валидация
   const validateForm = () => {
     const requiredFields = [
       'firstName',
@@ -45,7 +43,6 @@ export default function Form() {
       const value = formData[field];
       let isEmpty = false;
 
-      // Проверка на пустоту в зависимости от типа
       if (value === undefined || value === null) {
         isEmpty = true;
       } else if (typeof value === 'string' && value.trim() === '') {
@@ -65,11 +62,8 @@ export default function Form() {
     });
 
     setErrors(newErrors);
-
-    // Логируем данные формы и ошибки для отладки
     console.log('📋 Данные формы:', formData);
     console.log('❌ Ошибки валидации:', newErrors);
-
     return isValid;
   };
 
@@ -77,7 +71,6 @@ export default function Form() {
     e.preventDefault();
 
     if (!validateForm()) {
-      // Формируем список полей с ошибками
       const fieldNames = {
         firstName: 'Имя',
         lastName: 'Фамилия',
@@ -133,8 +126,6 @@ export default function Form() {
     }
   };
 
-
-
   const getInputClassName = (fieldName) => {
     const base =
       'w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-black/40 border rounded-md focus:outline-none focus:ring-2 text-white transition-colors text-sm sm:text-base';
@@ -148,7 +139,7 @@ export default function Form() {
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-[#A7EF9E]/30 text-white">
       <h2 className="text-xl sm:text-2xl font-bold text-[#A7EF9E] mb-3 sm:mb-4">Анкета</h2>
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-        {/* Поля – все одинаковой структуры, но с адаптивными отступами */}
+        {/* Имя */}
         <div>
           <label className="block text-xs sm:text-sm font-medium mb-1">Имя *</label>
           <input
@@ -163,10 +154,111 @@ export default function Form() {
           )}
         </div>
 
-        {/* Повторить для всех остальных полей (фамилия, отчество, рост, дата, цвет, игра, фрукт) с аналогичными классами */}
-        {/* ... (остальные поля – копируем, меняем только name и label) */}
+        {/* Фамилия */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Фамилия *</label>
+          <input
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            className={getInputClassName('lastName')}
+          />
+          {errors.lastName && (
+            <p className="text-red-400 text-[10px] sm:text-xs mt-1">Поле обязательно</p>
+          )}
+        </div>
 
-        {/* Сообщение статуса */}
+        {/* Отчество (необязательное) */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Отчество</label>
+          <input
+            type="text"
+            name="patronymic"
+            value={formData.patronymic}
+            onChange={handleChange}
+            className="w-full px-3 py-2 sm:px-4 sm:py-2.5 bg-black/40 border border-[#A7EF9E]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A7EF9E] text-white text-sm sm:text-base transition-colors"
+          />
+        </div>
+
+        {/* Рост */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Рост (см) *</label>
+          <input
+            type="number"
+            name="height"
+            value={formData.height}
+            onChange={handleChange}
+            min="1"
+            step="0.1"
+            className={getInputClassName('height')}
+          />
+          {errors.height && (
+            <p className="text-red-400 text-[10px] sm:text-xs mt-1">Введите рост (число)</p>
+          )}
+        </div>
+
+        {/* Дата рождения */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Дата рождения *</label>
+          <input
+            type="date"
+            name="birthDate"
+            value={formData.birthDate}
+            onChange={handleChange}
+            className={getInputClassName('birthDate')}
+          />
+          {errors.birthDate && (
+            <p className="text-red-400 text-[10px] sm:text-xs mt-1">Выберите дату</p>
+          )}
+        </div>
+
+        {/* Любимый цвет */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Любимый цвет *</label>
+          <input
+            type="text"
+            name="favoriteColor"
+            value={formData.favoriteColor}
+            onChange={handleChange}
+            className={getInputClassName('favoriteColor')}
+          />
+          {errors.favoriteColor && (
+            <p className="text-red-400 text-[10px] sm:text-xs mt-1">Введите цвет</p>
+          )}
+        </div>
+
+        {/* Любимая игра */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Любимая игра *</label>
+          <input
+            type="text"
+            name="favoriteGame"
+            value={formData.favoriteGame}
+            onChange={handleChange}
+            className={getInputClassName('favoriteGame')}
+          />
+          {errors.favoriteGame && (
+            <p className="text-red-400 text-[10px] sm:text-xs mt-1">Введите игру</p>
+          )}
+        </div>
+
+        {/* Любимый фрукт */}
+        <div>
+          <label className="block text-xs sm:text-sm font-medium mb-1">Любимый фрукт *</label>
+          <input
+            type="text"
+            name="favoriteFruit"
+            value={formData.favoriteFruit}
+            onChange={handleChange}
+            className={getInputClassName('favoriteFruit')}
+          />
+          {errors.favoriteFruit && (
+            <p className="text-red-400 text-[10px] sm:text-xs mt-1">Введите фрукт</p>
+          )}
+        </div>
+
+        {/* Статус */}
         {status.message && (
           <div
             className={`p-2 rounded text-sm ${
@@ -179,6 +271,7 @@ export default function Form() {
           </div>
         )}
 
+        {/* Кнопка отправки */}
         <button
           type="submit"
           disabled={loading}
